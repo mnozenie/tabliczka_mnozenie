@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<title>tabliczka mnożenia dla Julki i Miłosza</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://www.w3schools.com/lib/w3-theme-brown.css">
+<script>
+    var liczby = [];
+    var ileDzialan = 0;
+    var id;
+    var poziom = 0;
+    var poprawnych = 0;
+    var punktow = 0;
+    //
+    function losujLiczby() {
+        if (document.getElementById("proste").checked) {
+            liczby = [getRandomInt(0, 11), getRandomInt(0, 11)];
+            setValue("l1", liczby[0]);
+            setValue("l2", liczby[1]);
+        }
+        if (document.getElementById("trudne").checked) {
+            liczby = [getRandomInt(0, 11), getRandomInt(10, 101)];
+            setValue("l1", liczby[0]);
+            setValue("l2", liczby[1]);
+        }
+        if (document.getElementById("ekspert").checked) {
+            liczby = [getRandomInt(10, 101), getRandomInt(10, 101)];
+            setValue("l1", liczby[0]);
+            setValue("l2", liczby[1]);
+        }
+    }
+    function start() {
+        setValue("komunikat", "Podaj wynik działania");
+        losujLiczby();
+        clearInterval(id);
+        poziom = 1;
+        setValue("p3", poziom);
+        poprawnych = 0;
+        setValue("p1", poprawnych);
+        punktow = 0;
+        ileDzialan = 1
+        setValue("p2", ileDzialan);
+        dzialanie();
+        progressBar_move();
+        for (i = 1; i < 5; i++) {
+            document.getElementById("w" + i).disabled = false;
+        }
+        var element = document.getElementById("guziki");
+        element.classList.remove("w3-disabled");
+    }
+    function zakoncz() {
+        setValue("komunikat", "Koniec zabawy. Twój wynik to: " + punktow + " punktów z " + ileDzialan+' działań');
+        setValue("l1", "0");
+        setValue("l2", "0");
+        for (i = 1; i < 5; i++) {
+            setValue("w" + i, "0");
+        }
+        var eguziki = document.getElementById("guziki");
+        eguziki.classList.add("w3-disabled");
+        var ewyniki = document.getElementById("wyniki");
+        ewyniki.innerHTML = ewyniki.innerHTML + "<span>" + punktow + "/" + ileDzialan + " </span>";
+    }
+    function wynik() {
+        return liczby[0] * liczby[1];
+    }
+    function setValue(elem, val) {
+        var element = document.getElementById(elem);
+        element.innerText = val;
+    }
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min)) + min;
+    }
+    function fod (){
+        var vwynik = (""+wynik()).length;
+        if (vwynik == 1){return  0;}
+        if (vwynik == 2){return  10;}
+        if (vwynik == 3){return  100;}
+        if (vwynik == 4){return  1000;}
+    }
+    function fdo (){
+        var vwynik = (""+wynik()).length;
+        if (vwynik == 1){return  11;}
+        if (vwynik == 2){return  101;}
+        if (vwynik == 3){return  1001;}
+        if (vwynik == 4){return  10001;}
+    }
+    function dzialanie() {
+        losujLiczby();
+       
+
+        for (i = 1; i < 5; i++) {
+            var btn = document.getElementById("w" + i);
+            btn.innerText = getRandomInt(fod(), fdo());
+            if (btn.innerText == wynik()) btn.innerText = btn.innerText + 1; // w razie gdyby się wylosował poprawny wynik
+        }
+        setValue("w" + getRandomInt(1, 5), wynik());
+
+    }
+    function progressBar_move() {
+        var progressBar = document.getElementById("progressBar");
+        var width = 100;
+        progressBar.style.width = width
+        var predkosc = 100 / poziom + 1;
+        id = setInterval(frame, predkosc);
+        function frame() {
+            if (width <= 0) {
+                clearInterval(id);
+                zakoncz();
+            } else {
+                width--;
+                progressBar.style.width = width + '%';
+            }
+        }
+    }
+    function punkty(btn) {
+        if (btn.innerText == liczby[0] * liczby[1]) {
+            if (parseInt(document.getElementById("progressBar").style.width) > 0) {
+                poprawnych++;
+                if (document.getElementById("proste").checked) {
+                    punktow = punktow + 1;
+                    setValue("p1", punktow);
+                }
+                if (document.getElementById("trudne").checked) {
+                    punktow = punktow + 3;
+                    setValue("p1", punktow);
+                }
+                if (document.getElementById("ekspert").checked) {
+                    punktow = punktow + 5;
+                    setValue("p1", punktow);
+                }
+                if ((poprawnych % 10) == 0) {
+                    poziom++;
+                    setValue("p3", poziom);
+                }
+            }
+        }
+        ileDzialan = ileDzialan + 1;
+        setValue("p2", ileDzialan);
+        dzialanie();
+        clearInterval(id);
+        progressBar_move();
+    }
+    function pokaz_ustawienia() {
+        if (document.getElementById('ustawienia').style.display == 'block') { document.getElementById('ustawienia').style.display = 'none'; }
+        else { document.getElementById('ustawienia').style.display = 'block'; }
+
+    }
+
+</script>
+
+<body>
+    <div class="w3-panel w3-padding-16">
+        <div class="w3-card-4 w3-center w3-container w3-theme-l4 ">
+            <header class="w3-theme-l1"><span id="komunikat">Gotowy? Kliknij start</span>
+                <h1><span id="l1">0</span> <span>*</span> <span id="l2">0</span> <span>=</span> </h1>
+            </header>
+            <div class="w3-container" id="guziki">
+                <p><button onclick="punkty(this)" class="w3-button w3-block w3-theme-l2 "><span
+                            id="w1">0</span></button>
+                </p>
+                <p><button onclick="punkty(this)" class="w3-button w3-block  w3-theme-l2 "><span
+                            id="w2">0</span></button></p>
+                <p><button onclick="punkty(this)" class="w3-button w3-block  w3-theme-l2 "><span
+                            id="w3">0</span></button></p>
+                <p><button onclick="punkty(this)" class="w3-button w3-block  w3-theme-l2 "><span
+                            id="w4">0</span></button></p>
+            </div>
+            <div class="w3-container ">
+                Twoje punkty: <span id="p1" class="w3-badge">0</span> z <span id="p2" class="w3-badge">0</span> zadań
+                Szybkość:<span id="p3" class="w3-badge">0</span>
+                <p id="start"><button onclick="start()"
+                        class="w3-button w3-block  w3-theme-l2"><span>Start/Reset</span></button></p>
+            </div>
+            <button class="w3-btn" onclick="pokaz_ustawienia();">Ustawinia i wyniki</button>
+            <div id="ustawienia" class="w3-panel w3-display-container w3-theme-l2 w3-card-4" style="display:none">
+                <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-topright">X</span>
+                <p><input class="w3-radio" type="radio" name="trudnosc" id="proste" checked><label>Działania 1 * 1 za 1
+                        pkt</label></p>
+                <p><input class="w3-radio" type="radio" name="trudnosc" id="trudne"><label>Działania 10 * 1 za 3
+                        pkt</label></p>
+                <p><input class="w3-radio" type="radio" name="trudnosc" id="ekspert"><label>Działania 10 * 10 za 5
+                        pkt</label></p>
+                <div class="w3-container w3-disabled" id="wyniki"><span>Twoje ostatnie wyniki: </span> </div>
+            </div>
+
+            <footer>
+                <p div id="progressBar" class="w3-theme-d5" style="height:24px;width:0"></p>
+            </footer>
+        </div>
+    </div>
+
+    <footer class="w3-container ">
+        <div class="w3-bar w3-border w3-light-grey">&copy
+            <a href="https://gisprogrammer.github.io/">gisprogrammer</a>
+        </div>
+    </footer>
+
+</body>
+
+</html>
